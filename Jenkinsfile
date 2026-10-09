@@ -2,6 +2,9 @@ pipeline {
     agent {
         label 'linux-maven-agent'
     }
+     options {
+        skipDefaultCheckout(true)
+    }
 
     environment {
         GITHUB_CREDS = credentials('github-package-credential')
@@ -12,11 +15,22 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
+stage('Checkout Code') {
+    steps {
+        script {
+            checkout([
+                $class: 'GitSCM',
+                branches: [[name: '*/main']],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [],
+                userRemoteConfigs: [[
+                    url: 'https://github.com/dhanushmohan05/jenkins-maven-github-package.git'
+                ]],
+                gitTool: 'LinuxGit'
+            ])
         }
+    }
+}
 
         stage('Verify Environment') {
             steps {
